@@ -105,6 +105,33 @@ int chance = 150; //šance na padnutí powerupu
 
 bool bl = true;
 bool slowmode = false;
+
+byte game = 0; //0-main menu, 1-enemy chaser, 2-striker
+byte tempgame = 1; //temp for menu selection
+
+//Striker Variables:
+
+int power = 20;
+byte targetX = 0;
+const byte targetY = 1;
+
+byte friction = 5; //1-min,10-max
+
+byte s_page = 0; //page ve strikeru
+byte s_score = 0; //score ve strikeru
+
+bool s_menu = false; //jestli jste ve strikeru v menu
+
+byte s_bX = 0;
+
+byte tol = 50; //tolerance střely
+
+//COUNTDOWN variables :)
+
+float time_set = 0;
+float time_ela = 0;
+
+
  
  void setup() {
   Serial.begin(250000);
@@ -113,12 +140,18 @@ bool slowmode = false;
   pinMode(21,OUTPUT);
 
   randomSeed(millis());
+  digitalWrite(10,HIGH);
   
   lcd.begin(16, 2);
   lcd.setCursor(0,0);
-  lcd.print(wM);
+  lcd.print("Select your game");
   lcd.setCursor(0,1);
-  lcd.print(wM2);
+  lcd.print("SLTD:");
+  if(tempgame == 1){
+    lcd.print("EnemyChaser");
+  }else if(tempgame == 2){
+    lcd.print("STRIKEr");
+  }
 
   lcd.createChar(1,player);
   lcd.createChar(2,enemy);
@@ -143,6 +176,49 @@ bool slowmode = false;
 }
 
 void loop() {
+if(game == 0){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Select your game");
+  lcd.setCursor(0,1);
+  lcd.print("SLTD:");
+  if(tempgame == 1){
+    lcd.print("EnemyChaser");
+  }else if(tempgame == 2){
+    lcd.print("STRIKEr");
+  }else if(tempgame == 3){
+    lcd.print("CountDown:)");
+  }
+  delay(20);
+  
+  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){// SELECT
+  game = tempgame;
+  lcd.clear();
+  delay(500);
+  if(tempgame == 2){
+    s_menu = true;
+  }
+}
+if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800){//LEFT
+    if(tempgame > 1){
+      tempgame--;
+      delay(200);
+    }
+  }
+  if(analogRead(A0) < 50 || analogRead(A9) < 300){ //RIGHT
+    if(tempgame < 3){
+      tempgame++;
+      delay(200);
+    }
+  }
+}
+
+
+
+
+//START here for enemy chaser - higher is menu thing or some device-wide stuff
+
+  if(game == 1){
   if(slowmode == true){
     delay(500);
   }
@@ -186,7 +262,7 @@ if(page > 0){
 
 
   
-  if(analogRead(A0) < 50 && play == false || analogRead(A9) < 300 && GAMEPAD == true && play == false){
+  if(analogRead(A0) < 50 && play == false || analogRead(A9) < 300 && GAMEPAD == true && play == false){ //RIGHT
    /* lcd.clear();
     lcd.setCursor(0,0);
     lcd.print("Game programmer:");
@@ -214,7 +290,7 @@ if(page > 0){
     page++;
     }
   }
-if(analogRead(A0) > 400 && analogRead(A0) < 500 && play == false|| play == false && analogRead(A9) > 800 && GAMEPAD == true){
+if(analogRead(A0) > 400 && analogRead(A0) < 500 && play == false|| play == false && analogRead(A9) > 800 && GAMEPAD == true){ //LEFT
     if(page != 0){
       page--;
     }
@@ -418,6 +494,292 @@ if(play == true){
 
 delay(enemySpeed);
 }
+//end here for enemy chaser - start for STRIKEr
+
+if(game == 2){
+  draw_striker_menu:
+ if(s_menu == true){
+  if(s_page == 0){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print(" STRIKEr - menu ");
+    lcd.setCursor(0,1);
+    lcd.print(" PLAY BY SELECT ");
+    delay(20);
+  }else if(s_page == 1){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("striker_mega");
+    lcd.setCursor(0,1);
+    lcd.print("version_beta_1_1");
+    delay(20);
+  }else if(s_page == 2){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("FRICTION LEVEL:");
+    lcd.setCursor(0,1);
+    lcd.print(friction);
+    lcd.print("/10");
+    delay(20);
+  }else if(s_page == 3){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SHOT TOLERANCE:");
+    lcd.setCursor(0,1);
+    lcd.print(tol);
+    lcd.print("/70");
+    delay(20);
+  }
+  
+if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPAD == true){ // UP
+    if(s_page == 2){
+      if(friction < 10){
+      friction++;
+      delay(200);
+      }
+    }
+  }
+  if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800 && GAMEPAD == true){ // DOWN
+    if(s_page == 2){
+      if(friction > 2){
+        friction--;
+        delay(200);
+      }
+    }
+  }
+if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPAD == true){ // UP
+    if(s_page == 3){
+      if(tol < 70){
+      tol++;
+      delay(100);
+      }
+    }
+  }
+  if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800 && GAMEPAD == true){ // DOWN
+    if(s_page == 3){
+      if(tol > 10){
+        tol--;
+        delay(100);
+      }
+    }
+  }
+
+
+
+ if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800){//LEFT
+    if(s_page > 0){
+      s_page--;
+      delay(100);
+    }
+  }
+  if(analogRead(A0) < 50 || analogRead(A9) < 300){ //RIGHT
+    if(s_page < 3){
+      s_page++;
+      delay(100);
+    }
+  }
+
+  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+    if(s_page == 0){
+      s_menu = false;
+      lcd.clear();
+      delay(500);
+    }
+  }
+    
+ }else{
+
+      power = 20;
+      targetX = random(3,15);
+      lcd.clear();
+      lcd.setCursor(targetX,targetY);
+      lcd.write(2);
+      lcd.setCursor(0,1);
+      lcd.write(1);
+
+    checker:
+    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+      //jde to dál
+    }else{
+      
+      lcd.setCursor(0,0);
+      lcd.print("PWR: ");
+      if(power < 100){
+        lcd.print(" ");
+      }
+      lcd.print(power);
+      delay(20);
+      
+      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300){
+        if(power < 250){
+          power=power+5;
+        }
+        
+      }
+      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800){
+        if(power > 20){
+          power=power-5;
+        }
+      }
+      goto checker;
+    }
+    //mám nabito
+    s_bX = 1;
+    while(s_bX != targetX){
+      
+      lcd.setCursor(s_bX,1);
+      lcd.print("o");
+      if(s_bX > 1){
+        lcd.setCursor(s_bX - 1,1);
+        lcd.print(" ");
+      }
+      s_bX++;
+
+      if(power < power - friction * 3){
+        s_gameOver();
+        goto draw_striker_menu;
+      }
+
+      
+      power = power - friction * 3;
+      lcd.setCursor(0,0);
+      lcd.print("PWR: ");
+      if(power < 100 && power > 9){
+        lcd.print(" ");
+      }else if(power < 10 || power > 250){
+        s_gameOver();
+        goto draw_striker_menu;
+      }
+      lcd.print(power);
+    delay(1000);
+    if(power < 1){
+      s_gameOver();
+      goto draw_striker_menu;
+    }
+      
+    }
+    if(power > 50){
+      s_gameOver_p();
+    }else{
+      s_gameWon();
+    }
+    s_menu = true;
+    goto draw_striker_menu;
+
+
+
+
+    
+  }
+ }
+
+if(game == 3){
+  time_set = 0.05;
+  checker2:
+    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+      //jde to dál
+    }else{
+      
+      lcd.setCursor(0,0);
+      lcd.print("   TM SET: ");
+      if(time_set < 10){
+        lcd.print(" ");
+      }
+      lcd.print(time_set);
+      delay(20);
+      
+      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300){
+        if(time_set < 100){
+          time_set=time_set+0.01;
+        }
+        
+      }
+      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800){
+        if(time_set > 0.05){
+          time_set=time_set-0.01;
+        }
+      }
+      goto checker2;
+    }
+    while(time_set > 0){
+      time_set = time_set - 0.004167;
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("CountDown: ");
+      if(time_set < 10){
+        lcd.print(" ");
+      }
+      lcd.print(time_set);
+      delay(250);
+    }
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("BOO, BOO, BOOM!");
+    lcd.setCursor(0,1);
+    lcd.print("BOO, BOO, BOOM!");
+
+    while(!(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5)){
+    digitalWrite(10,LOW);
+    delay(250);
+    digitalWrite(10,HIGH);
+    delay(250);
+    }
+    digitalWrite(10,HIGH);
+    lcd.clear();
+    game = 0;
+    delay(2000);
+    
+
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+}
+
+void s_gameOver(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("   GAME OVER!   ");
+  lcd.setCursor(0,1);
+  lcd.print("NOT ENOUGH POWER");
+  delay(3000);
+  s_menu = true;
+}
+void s_gameOver_p(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("   GAME OVER!   ");
+  lcd.setCursor(0,1);
+  lcd.print("LITTLE TOO POWER");
+  delay(3000);
+  s_menu = true;
+}
+void s_gameWon(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("   GREAT WORK   ");
+  lcd.setCursor(0,1);
+  lcd.print(" YOU STRIKED IT ");
+  delay(3000);
+  s_menu = true;
+}
+
 
 
 void refresh(){

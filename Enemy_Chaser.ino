@@ -176,6 +176,28 @@ float time_ela = 0;
 }
 
 void loop() {
+
+  //EVERYGAME STUFF HERE
+if(GAMEPAD == true){
+  digitalWrite(20,HIGH);
+}else{
+  digitalWrite(20,LOW);
+}
+if(analogRead(A10) < 5){
+  digitalWrite(21,HIGH);
+}else{
+  digitalWrite(21,LOW);
+}
+
+  
+if(bl == true){
+  digitalWrite(10,HIGH);
+}else{
+  digitalWrite(10,LOW);
+}
+
+ //END OF THIS SH*T PLEASE :)
+  
 if(game == 0){
   lcd.clear();
   lcd.setCursor(0,0);
@@ -188,6 +210,8 @@ if(game == 0){
     lcd.print("STRIKEr");
   }else if(tempgame == 3){
     lcd.print("CountDown:)");
+  }else if(tempgame == 4){
+    lcd.print("InConnected");
   }
   delay(20);
   
@@ -206,7 +230,7 @@ if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800){//LEFT
     }
   }
   if(analogRead(A0) < 50 || analogRead(A9) < 300){ //RIGHT
-    if(tempgame < 3){
+    if(tempgame < 4){
       tempgame++;
       delay(200);
     }
@@ -223,22 +247,7 @@ if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800){//LEFT
     delay(500);
   }
   
-if(analogRead(A10) < 5){
-  digitalWrite(21,HIGH);
-}else{
-  digitalWrite(21,LOW);
-}
-if(GAMEPAD == true){
-  digitalWrite(20,HIGH);
-}else{
-  digitalWrite(20,LOW);
-}
-  
-if(bl == true){
-  digitalWrite(10,HIGH);
-}else{
-  digitalWrite(10,LOW);
-}
+
 
 if(Serial.available() > 0){
   cmdHandle();
@@ -286,7 +295,7 @@ if(page > 0){
     lcd.print(GAMEPAD);
     delay(3000);
   */
-    if(page != 8){
+    if(page != 9){
     page++;
     }
   }
@@ -361,6 +370,13 @@ if(analogRead(A0) > 400 && analogRead(A0) < 500 && play == false|| play == false
     lcd.setCursor(0,1);
     lcd.print("CON_SPD_VAL: ");
     lcd.print(enemySpeed);
+  }else if(page == 9){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SELECT TO EXIT");
+    lcd.setCursor(0,1);
+    lcd.print("CLICK TO EXIT");
+
   }
 
 
@@ -393,9 +409,19 @@ if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPA
       enemySpeed = enemySpeed - 5;
     }
   }
-  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){ // Pokud je stisknuto SELECT, začne hru
+  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){ // SELECT
   if(page == 8){
       const_spd = !const_spd;
+    }
+}
+
+if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){ // SELECT
+  if(page == 9){
+      game = 0;
+      page = 0;
+      menu = true;
+      lcd.clear();
+      delay(2000);
     }
 }
 
@@ -566,20 +592,20 @@ if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPA
 
 
 
- if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800){//LEFT
+ if(analogRead(A0) > 400 && analogRead(A0) < 500 || analogRead(A9) > 800 && GAMEPAD == true){//LEFT
     if(s_page > 0){
       s_page--;
       delay(100);
     }
   }
-  if(analogRead(A0) < 50 || analogRead(A9) < 300){ //RIGHT
+  if(analogRead(A0) < 50 || analogRead(A9) < 300 && GAMEPAD == true){ //RIGHT
     if(s_page < 3){
       s_page++;
       delay(100);
     }
   }
 
-  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+  if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){
     if(s_page == 0){
       s_menu = false;
       lcd.clear();
@@ -598,7 +624,7 @@ if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPA
       lcd.write(1);
 
     checker:
-    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){
       //jde to dál
     }else{
       
@@ -610,13 +636,13 @@ if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPA
       lcd.print(power);
       delay(20);
       
-      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300){
-        if(power < 250){
+      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPAD == true){
+        if(power < 350){
           power=power+5;
         }
         
       }
-      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800){
+      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800 && GAMEPAD == true){
         if(power > 20){
           power=power-5;
         }
@@ -676,7 +702,7 @@ if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPA
 if(game == 3){
   time_set = 0.05;
   checker2:
-    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5){
+    if(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true){
       //jde to dál
     }else{
       
@@ -688,13 +714,13 @@ if(game == 3){
       lcd.print(time_set);
       delay(20);
       
-      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300){
+      if(analogRead(A0) > 50 && analogRead(A0) < 150 || analogRead(A8) < 300 && GAMEPAD == true){
         if(time_set < 100){
           time_set=time_set+0.01;
         }
         
       }
-      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800){
+      if(analogRead(A0) > 200 && analogRead(A0) < 300 || analogRead(A8) > 800 && GAMEPAD == true){
         if(time_set > 0.05){
           time_set=time_set-0.01;
         }
@@ -718,7 +744,7 @@ if(game == 3){
     lcd.setCursor(0,1);
     lcd.print("BOO, BOO, BOOM!");
 
-    while(!(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5)){
+    while(!(analogRead(A0) > 600 && analogRead(A0) < 700 || analogRead(A10) < 5 && GAMEPAD == true)){
     digitalWrite(10,LOW);
     delay(250);
     digitalWrite(10,HIGH);
@@ -732,24 +758,56 @@ if(game == 3){
 
   
 }
+//-----------END OF COUNTDOWN --- START OF INCONNECTED ----
+if(game == 4){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("PRESS UP TO");
+  lcd.setCursor(0,1);
+  lcd.print("CONNECT GAMEPAD");
 
+  checker3:
+    if(analogRead(A0) > 50 && analogRead(A0) < 150){
+      checkConnectedDVCs();
+      if(GAMEPAD == true){
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Gamepad uspesne");
+    lcd.setCursor(0,1);
+    lcd.print("pripojen ke hre.");
+    delay(2000);
+    lcd.clear();
+      
+    }else{
+    lcd.setCursor(0,0);
+    lcd.print("Gamepad se nepo-");
+    lcd.setCursor(0,1);
+    lcd.print("darilo pripojit.");
+    delay(2000);
+    lcd.clear();
+    }
+    game = 0;
+    }else if(analogRead(A0) > 200 && analogRead(A0) < 300){
 
+      game = 0;
+      GAMEPAD = false;
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Gamepad byl");
+      lcd.setCursor(0,1);
+      lcd.print("odpojen ze hry.");
 
+      delay(1000);
+      lcd.clear();
+      
+    }else{
+      goto checker3;
+    }
 
+    
+}
+//END OF INCONNECTED
 
-
-
-
-
-
-
-
-
-
-
-
-
- 
 }
 
 void s_gameOver(){
@@ -920,16 +978,6 @@ void cmdHandle(){
     slowmode = !slowmode;
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
